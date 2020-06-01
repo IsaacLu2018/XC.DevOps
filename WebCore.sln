@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XC.DevOps", "WebCore\XC.DevOps.csproj", "{D8A9A381-62CB-46DD-85B1-A8CF3AC7C178}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetModel", "GetModel\GetModel.csproj", "{BB5C09DB-239A-404A-9E25-CB7C11900FBE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetModel", "GetModel\GetModel.csproj", "{BB5C09DB-239A-404A-9E25-CB7C11900FBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevOps.WorkerService", "DevOps.WorkerService\DevOps.WorkerService.csproj", "{70DBBBDB-185B-45B4-AA8F-C4F27E4CA68F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{BB5C09DB-239A-404A-9E25-CB7C11900FBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB5C09DB-239A-404A-9E25-CB7C11900FBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB5C09DB-239A-404A-9E25-CB7C11900FBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70DBBBDB-185B-45B4-AA8F-C4F27E4CA68F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70DBBBDB-185B-45B4-AA8F-C4F27E4CA68F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70DBBBDB-185B-45B4-AA8F-C4F27E4CA68F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70DBBBDB-185B-45B4-AA8F-C4F27E4CA68F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

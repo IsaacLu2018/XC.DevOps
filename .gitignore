@@ -6,3 +6,6 @@
 /GetModel/obj
 /.vs/WebCore/v16
 /.vs/WebCore
+/DevOps.WorkerService/bin/Debug/netcoreapp3.1
+/DevOps.WorkerService/Log/ExceptionLog/2020/202006
+/DevOps.WorkerService/obj

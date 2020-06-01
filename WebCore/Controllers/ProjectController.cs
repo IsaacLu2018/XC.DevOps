@@ -152,12 +152,13 @@ namespace XC.DevOps.Controllers
         /// <param name="Id"></param>
         /// <returns></returns>
         [HttpPost("Update")]
-        public ResponseBaseModel Update([FromBody] ProjectModel req)
+        public async Task<ResponseBaseModel> Update([FromBody] ProjectModel req)
         {
             var res = new ResponseBaseModel()
             {
                 isSuccess = false
             };
+            bool updateWIki = false;
             if (null != req)
             {
                 using (var context = new hz_xc_devopsContext())
@@ -176,11 +177,16 @@ namespace XC.DevOps.Controllers
                             project.Team = req.team;
                             project.Client = req.client;
                             project.State = req.state;
-                            project.Description = req.description;
+                            if (project.Description != req.description)
+                            {
+                                project.Description = req.description;
+                                updateWIki = true;
+                            }
                             datebase.Update(project);
                         }
                         else
                         {
+                            updateWIki = true;
                             var newProject = new DevopsProject() { };
                             // 插入新的
                             ModelBindGenericClass<ProjectModel, DevopsProject>.ModelBind(req, newProject);
@@ -190,6 +196,22 @@ namespace XC.DevOps.Controllers
                         // 提交
                         context.SaveChanges();
                         res.isSuccess = true;
+
+                        // 不显示调用wiki结果
+                        if (updateWIki)
+                        {
+                            // 同步wiki
+                            string url = $"{_configuration.GetSection("Urls").GetSection("DevOps").Value}/api/Project/SendWiki?projectGuid={req.Id}&content={req.description}";
+                            using (var client = _httpClientFactory.CreateClient())
+                            {
+                                HttpContent httpContent = new StringContent("", Encoding.UTF8);
+                                httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                                HttpResponseMessage response = await client.PostAsync(url, httpContent);
+                                var wikiRes = await response.Content.ReadAsStringAsync();
+                                // wiki 同步结果不显示
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
