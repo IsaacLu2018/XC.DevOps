@@ -3,9 +3,11 @@ import {
   convertFromHTML,
   EditorState,
   ContentState,
+  convertToRaw
 } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import marked from "marked";
+import draftToMarkdown from 'draftjs-to-markdown';
 
 marked.setOptions({
   // marked 设置
@@ -33,20 +35,25 @@ export class MarkDownEditor extends Component {
       defaultEditorState: EditorState.createWithContent(
         ContentState.createFromBlockArray(convertFromHTML(markedHTML))
       ),
+      markdownContent:undefined
     };
   }
 
   onEditorStateChange = (editorState) => {
-    // console.log("editorState", editorState);
+    const markdownContent = editorState && draftToMarkdown(convertToRaw(editorState.getCurrentContent()));
     this.setState({
       editorState,
+      markdownContent
     });
+
+    console.log('MarkDown Content:', markdownContent);
+    this.props.onChangeMarkDown(markdownContent);
   };
 
   //获取内容变化值
   onEditorChange = (contentState) => {
     console.log(JSON.stringify(contentState));
-    this.props.onEditorChange(contentState);
+    //this.props.onEditorChange(contentState);
   };
 
   handleGetText = () => {
@@ -54,6 +61,7 @@ export class MarkDownEditor extends Component {
       isShowText: true,
     });
   };
+
   render() {
     const {defaultEditorState } = this.state;
 
@@ -63,11 +71,14 @@ export class MarkDownEditor extends Component {
           defaultEditorState={defaultEditorState}
           onContentStateChange={this.onEditorChange} //获取内容变化值
           onEditorStateChange={this.onEditorStateChange} //编辑器状态发生变化时
+          toolbarStyle={{borderWidth:0}}
           editorStyle={{
             minHeight: 300,
             width: 600,
             borderStyle: "solid",
+            borderColor:'#d9d9d9',
             borderWidth: 1,
+            padding:4
           }}
         />
       </div>

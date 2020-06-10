@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GetModel.DataBaseModel
+namespace GetModel.DevOpsModels
 {
     public partial class DevopsProject
     {

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace GetModel.DataBaseModel
+namespace GetModel.DevOpsModels
 {
     public partial class hz_xc_devopsContext : DbContext
     {
@@ -15,6 +15,7 @@ namespace GetModel.DataBaseModel
         {
         }
 
+        public virtual DbSet<DevopsLastUpdate> DevopsLastUpdate { get; set; }
         public virtual DbSet<DevopsProject> DevopsProject { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -22,12 +23,38 @@ namespace GetModel.DataBaseModel
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql("data source=172.16.8.7;port=3306;database=hz_xc_devops;user id=root;password=p@ssw0rd;charset=utf8", x => x.ServerVersion("5.6.21-mysql"));
+                optionsBuilder.UseMySql("data source=129.204.109.115;port=3306;database=hz_xc_devops;user id=Isaac;password=123456;charset=utf8", x => x.ServerVersion("5.6.21-mysql"));
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<DevopsLastUpdate>(entity =>
+            {
+                entity.ToTable("devops_last_update");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.LastUpdateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.LastUpdateUser)
+                    .HasColumnType("varchar(50)")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_bin");
+
+                entity.Property(e => e.LastUpdateUserId)
+                    .HasColumnType("varchar(50)")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_bin");
+
+                entity.Property(e => e.OpreationDetail)
+                    .HasColumnType("varchar(255)")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_bin");
+            });
+
             modelBuilder.Entity<DevopsProject>(entity =>
             {
                 entity.ToTable("devops_project");
@@ -87,7 +114,7 @@ namespace GetModel.DataBaseModel
 
                 entity.Property(e => e.Order)
                     .HasColumnName("order")
-                    .HasColumnType("decimal(11,5)")
+                    .HasColumnType("decimal(14,4)")
                     .HasComment("项目实际顺序 结合优先级排序");
 
                 entity.Property(e => e.Priority)

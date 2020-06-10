@@ -9,3 +9,8 @@
 /DevOps.WorkerService/bin/Debug/netcoreapp3.1
 /DevOps.WorkerService/Log/ExceptionLog/2020/202006
 /DevOps.WorkerService/obj
+/GetModel/bin/Release/netcoreapp3.1
+/.vs/XC.DevOps
+/DevOps.WorkerService/bin/Release/netcoreapp3.1
+/DevOps.WorkerService/Properties/PublishProfiles
+/WorkerService.DevOps/obj

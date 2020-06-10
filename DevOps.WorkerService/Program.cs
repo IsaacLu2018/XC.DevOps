@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using GetModel.OneDoModels;
 using log4net;
 using log4net.Config;
 using log4net.Repository;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,7 +29,10 @@ namespace DevOps.WorkerService
                     services.AddSingleton<IConfiguration>(hostContext.Configuration);
                     services.AddHostedService<Worker>();
                     services.AddLogging();
-
+                    //services.AddDbContext<doContext>(options =>
+                    //{
+                    //    options.UseMySql(hostContext.Configuration.GetConnectionString("Do"));
+                    //});
                     // 配置日志
                     repository = LogManager.CreateRepository("NETCoreRepository");
                     string assemblyFilePath = Assembly.GetExecutingAssembly().Location;

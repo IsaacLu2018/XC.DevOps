@@ -7,194 +7,21 @@ import {
   Menu,
   Row,
   Col,
+  ConfigProvider,
+  Select,
 } from "antd";
+import { employers } from "../mock/users";
 import { TeamOutlined, LaptopOutlined } from "@ant-design/icons";
 import React from "react";
 import moment from "moment";
 import { find } from "lodash";
+import zhCN from "antd/es/locale/zh_CN";
+import { infoData } from "../mock/reports";
+import "moment/locale/zh-cn";
+
+moment.locale("zh-cn");
 const _ = require("underscore");
-const infoData = [
-  {
-    parentSK: 0,
-    workItemTreeSK: 20,
-    system_Id: 3,
-    workItemTitle: "1do 任务同步（discussion && 状态）",
-    assignTo: null,
-    workItemType: "问题",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-27T18:13:41.973",
-    manHour: null,
-  },
-  {
-    parentSK: 0,
-    workItemTreeSK: 23,
-    system_Id: 5,
-    workItemTitle: "项目进度报表开发协助",
-    assignTo: null,
-    workItemType: "问题",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: null,
-    manHour: null,
-  },
-  {
-    parentSK: 0,
-    workItemTreeSK: 37,
-    system_Id: 8,
-    workItemTitle: "日报获取、展示",
-    assignTo: null,
-    workItemType: "问题",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-29T14:58:41.76",
-    manHour: null,
-  },
-  {
-    parentSK: 0,
-    workItemTreeSK: 43,
-    system_Id: 9,
-    workItemTitle: "Azure Devops生产环境logo换掉",
-    assignTo: null,
-    workItemType: "问题",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-28T15:52:17.413",
-    manHour: null,
-  },
-  {
-    parentSK: 0,
-    workItemTreeSK: 46,
-    system_Id: 1,
-    workItemTitle: "第三方账户集成域账户登录",
-    assignTo: null,
-    workItemType: "问题",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: null,
-    manHour: null,
-  },
-  {
-    parentSK: 0,
-    workItemTreeSK: 49,
-    system_Id: 31,
-    workItemTitle: "需求01",
-    assignTo: null,
-    workItemType: "用户情景",
-    projectNodeGUID: "1b455782-0a51-40c7-91fc-7e9ece525534",
-    projectNodeName: "DevOps系统测试",
-    closedTime: null,
-    manHour: null,
-  },
-  {
-    parentSK: 0,
-    workItemTreeSK: 50,
-    system_Id: 32,
-    workItemTitle: "需求02",
-    assignTo: null,
-    workItemType: "用户情景",
-    projectNodeGUID: "1b455782-0a51-40c7-91fc-7e9ece525534",
-    projectNodeName: "DevOps系统测试",
-    closedTime: null,
-    manHour: null,
-  },
-  {
-    parentSK: 20,
-    workItemTreeSK: 47,
-    system_Id: 29,
-    workItemTitle: "模版配置",
-    assignTo: "周文洋",
-    workItemType: "任务",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-29T15:01:43.29",
-    manHour: null,
-  },
-  {
-    parentSK: 23,
-    workItemTreeSK: 30,
-    system_Id: 24,
-    workItemTitle: "提供wiki接口",
-    assignTo: null,
-    workItemType: "任务",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-29T15:00:14.43",
-    manHour: null,
-  },
-  {
-    parentSK: 37,
-    workItemTreeSK: 38,
-    system_Id: 25,
-    workItemTitle: "原型设计",
-    assignTo: "周文洋",
-    workItemType: "任务",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-29T09:20:24.183",
-    manHour: null,
-  },
-  {
-    parentSK: 37,
-    workItemTreeSK: 40,
-    system_Id: 26,
-    workItemTitle: "接口开发",
-    assignTo: "陈晓平",
-    workItemType: "任务",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-29T09:25:13.773",
-    manHour: null,
-  },
-  {
-    parentSK: 43,
-    workItemTreeSK: 44,
-    system_Id: 27,
-    workItemTitle: "替换文本",
-    assignTo: "陈晓平",
-    workItemType: "任务",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-29T15:01:03.32",
-    manHour: null,
-  },
-  {
-    parentSK: 46,
-    workItemTreeSK: 48,
-    system_Id: 30,
-    workItemTitle: "验证",
-    assignTo: "周文洋",
-    workItemType: "任务",
-    projectNodeGUID: "f1cd5df8-2ca9-4cb7-8bac-a29abac964ea",
-    projectNodeName: "DevOps实施",
-    closedTime: "2020-05-29T15:02:01.57",
-    manHour: null,
-  },
-  {
-    parentSK: 49,
-    workItemTreeSK: 51,
-    system_Id: 33,
-    workItemTitle: "任务01",
-    assignTo: "周文洋",
-    workItemType: "任务",
-    projectNodeGUID: "1b455782-0a51-40c7-91fc-7e9ece525534",
-    projectNodeName: "DevOps系统测试",
-    closedTime: "2020-05-29T15:17:48.537",
-    manHour: 4,
-  },
-  {
-    parentSK: 50,
-    workItemTreeSK: 52,
-    system_Id: 34,
-    workItemTitle: "任务02",
-    assignTo: "周文洋",
-    workItemType: "任务",
-    projectNodeGUID: "1b455782-0a51-40c7-91fc-7e9ece525534",
-    projectNodeName: "DevOps系统测试",
-    closedTime: "2020-05-29T15:19:47.6",
-    manHour: 5,
-  },
-];
+const { Option } = Select;
 
 export class DailyReport extends React.Component {
   state = {
@@ -202,6 +29,11 @@ export class DailyReport extends React.Component {
     loading: true,
     current: "employer",
     day: moment(new Date()).format("YYYY-MM-DD"),
+    employers: [],
+    projects: [],
+    currentEmp: undefined,
+    currentProject: undefined,
+    allData: [],
   };
 
   FormatJson = (json) => {
@@ -209,6 +41,7 @@ export class DailyReport extends React.Component {
     const devJson = _.groupBy(json, "assignTo");
     // 取出用户
     let users = [];
+
     Object.keys(devJson).forEach((m) => {
       if (m && m !== "null") {
         users.push(m);
@@ -251,6 +84,54 @@ export class DailyReport extends React.Component {
     return infoJson;
   };
 
+  // 改变任意状态重新筛选内容
+  FilterData = () => {
+    const { currentEmp, currentProject, data, allData } = this.state;
+    let newData = allData;
+    let newProject = [];
+    // 当前没有选择任何项目
+    // TODO：排序为更新 需要调用api....
+    if(!currentEmp&!currentProject){
+      newProject = allData;
+    }
+    else
+    {
+      // 当前成员有值
+      if (currentEmp) {
+        allData.forEach((d) =>{
+          if(d.assignTo === currentEmp){
+            newProject.push(d);
+          }
+        });
+        newData = newProject;
+      }
+      // 当前项目有值
+      if (currentProject) {
+        newProject = [];
+        newData.forEach((d) => {
+          const userInfo = {
+            assignTo: d.assignTo,
+            projectList: [],
+            sum: 0,
+          };
+
+          if (d.projectList.length > 0) {
+            d.projectList.forEach((p) => {
+              console.log('p', p);
+              if (p.projectName === currentProject) {
+                userInfo.projectList.push(p);
+                userInfo.sum = p.Items.length - 1;
+                newProject.push(userInfo);
+              }
+            });
+          } 
+        });
+      }
+    }
+   
+    this.setState({ data: newProject });
+  };
+
   //优化后格式化方法
   handleTransform = () => {
     let newData = [];
@@ -291,14 +172,16 @@ export class DailyReport extends React.Component {
   };
 
   onChange = (date, dateString) => {
-    console.log(date, dateString);
-    this.setState({ day: dateString });
-    // 重新加载
-    this.GetWorkItems(dateString);
+    if (date) {
+      this.setState({ day: dateString });
+      // 重新加载
+      this.GetWorkItems(dateString);
+    } else {
+      this.setState({ day: null });
+    }
   };
 
   handleClick = (e) => {
-    console.log("click ", e);
     this.setState({
       current: e.key,
     });
@@ -306,11 +189,13 @@ export class DailyReport extends React.Component {
 
   componentDidMount() {
     this.GetWorkItems(this.state.day);
+    this.GetProjects();
   }
 
   render() {
-    const { data, loading } = this.state;
+    const { data, loading, projects } = this.state;
     const dateFormat = "YYYY-MM-DD";
+
     const InfoItem = (key, value) => (
       <div key={`${key}`}>
         <p>{value}</p>
@@ -340,7 +225,7 @@ export class DailyReport extends React.Component {
               )
             )}
           </Descriptions.Item>
-          <Descriptions.Item label="工时">
+          <Descriptions.Item label="工时（小时）">
             {data.projectList.map((m) =>
               m.Items.map((e) =>
                 InfoItem(`manHour-${e.system_Id}`, e.manHour ? e.manHour : "\\")
@@ -356,15 +241,17 @@ export class DailyReport extends React.Component {
     const ReprotMenu = () => (
       <Row>
         <Col span={4}>
-        <DatePicker
-          defaultValue={moment(this.state.day, dateFormat)}
-          format={dateFormat}
-          onChange={this.onChange}
-          style={{marginTop:15}}
-        />
+          <DatePicker
+            value={
+              this.state.day ? moment(this.state.day, dateFormat) : undefined
+            }
+            format={dateFormat}
+            onChange={this.onChange}
+            style={{ marginTop: 15 }}
+          />
         </Col>
-        <Col >
-        <Menu
+        <Col style={{ marginLeft: -37 }}>
+          {/* <Menu
           onClick={this.handleClick}
           mode="horizontal"
           selectedKeys={[this.state.current]}
@@ -375,34 +262,87 @@ export class DailyReport extends React.Component {
           <Menu.Item key="project" icon={<LaptopOutlined />}>
             项目
           </Menu.Item>
-        </Menu>
+        </Menu> */}
+          {Selecter("人员", employers)}
+          {Selecter("项目", projects)}
         </Col>
-        
       </Row>
     );
 
+    const Selecter = (type, data) => {
+      const { currentEmp, currentProject } = this.state;
+      const onChange = (value) => {
+        // 设置选中的内容
+        if (type == "人员") {
+          this.setState(
+            {
+              currentEmp:value
+            }, ()=> {
+               this.FilterData();
+            }
+          );
+        } else if (type == "项目") {
+          this.setState(
+            {
+              currentProject:value
+            }, ()=> {
+               this.FilterData();
+            }
+          );
+        }
+        console.log(`${type} selected ${value}`);
+      };
+
+      function onBlur() {
+        console.log("blur");
+      }
+
+      function onFocus() {
+        console.log("focus");
+      }
+
+      function onSearch(val) {
+        console.log("search:", val);
+      }
+
+      return (
+        <Select
+          showSearch
+          style={{ width: 160, marginTop: 15, marginLeft: 10 }}
+          placeholder={`选择${type}`}
+          optionFilterProp="children"
+          onChange={onChange}
+          value={type === "人员" ? currentEmp : currentProject}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onSearch={onSearch}
+          filterOption={(input, option) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+          allowClear
+        >
+          {data.map((m, index) => (
+            <Option value={m} key={`${type}_option_${index}`}>
+              {m}
+            </Option>
+          ))}
+        </Select>
+      );
+    };
+
     return (
-      <div>
+      <ConfigProvider locale={zhCN}>
         <ReprotMenu />
-        <Spin spinning={loading}>{data.map((j) => InfoCard(j))}</Spin>
-      </div>
+        <Divider orientation="left">日报详情</Divider>
+        <Spin tip="加载中..." spinning={loading}>
+          {data.map((j) => InfoCard(j))}
+        </Spin>
+      </ConfigProvider>
     );
   }
 
   // 初始化人员列表
   async GetWorkItems(day) {
-    // const url = `http://59.202.68.89:8080/api/Project/WorkItems?day=${day}`;
-    // var req = new Request(url, {
-    //   method: "POST",
-    //   headers: {
-    //     'Access-Control-Allow-Origin':'*',
-    //     "Content-Type": "application/json"
-    //   },
-    //   // mode: "no-cors"
-    // });
-    // const response = await fetch(req);
-    // const data = await response.json();
-
     const response = await fetch(`Project/GetWorkItems?day=${day}`);
     const resJson = await response.json();
     const data = this.FormatJson(resJson);
@@ -410,6 +350,17 @@ export class DailyReport extends React.Component {
     this.setState({
       loading: false,
       data,
+      allData: data,
+    });
+  }
+
+  // 获取项目列表
+  async GetProjects() {
+    const response = await fetch(`Project/GetProjects`);
+    const data = await response.json();
+    console.log("getProjects", data);
+    this.setState({
+      projects: data,
     });
   }
 }

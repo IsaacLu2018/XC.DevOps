@@ -15,8 +15,8 @@ namespace XC.DevOps.Extend
         public static ILoggerRepository repository { get; set; }
         public CustomMessageHandler()
         {
-            repository = LogManager.CreateRepository("NETCoreRepository");
-            _log = LogManager.GetLogger(repository.Name,"InfoLog");
+            repository = LogManager.CreateRepository("DevOpsApiRepository");
+            _log = LogManager.GetLogger(repository.Name, "ExceptionLog");
             
         }
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

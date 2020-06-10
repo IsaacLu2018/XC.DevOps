@@ -1,7 +1,10 @@
+using GetModel.DevOpsModels;
+using GetModel.OneDoModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,6 +26,11 @@ namespace WebCore
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddControllersWithViews();
             services.AddHttpClient();
+            services.AddDbContext<hz_xc_devopsContext>(options =>
+            {
+                options.UseMySql(Configuration.GetConnectionString("Default"));
+            });
+
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {

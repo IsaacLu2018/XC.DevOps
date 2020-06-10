@@ -14,6 +14,7 @@ namespace XC.DevOps.Common
             {"stop","暂停"},
             {"analyzing","需求调研分析"},
             {"testing","测试中"},
+            {"waiting","等待中"},
             {"designing","设计中"},
             {"running","运行维护"},
             {"done","完成"},

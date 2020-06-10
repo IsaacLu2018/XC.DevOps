@@ -9,25 +9,33 @@ import {
   Col,
   Button,
   Spin,
-  message
+  message,
+  Tooltip,
+  Rate,
 } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
 import React from "react";
-import moment from "moment";
 import { EditorState } from "draft-js";
 import draftToMarkdown from "draftjs-to-markdown";
 import { MarkDownEditor } from "./MarkDownEditor";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import star from "../Icons/star0.png";
+import grayStar from "../Icons/star1.png";
 import "./DragSortingTable.css";
+import moment from "moment";
+import "moment/locale/zh-cn";
+import { stateList } from "../mock/stateList";
 
+moment.locale("zh-cn");
 const type = "DragableBodyRow";
 const { Option } = Select;
 // 排序基数
 const _baseOrder = 655236;
 let content = "";
+let myStars = 0;
 
 const DragableBodyRow = ({
   index,
@@ -41,6 +49,8 @@ const DragableBodyRow = ({
     accept: type,
     collect: (monitor) => {
       const { index: dragIndex } = monitor.getItem() || {};
+      console.log("dragIndex", dragIndex);
+      console.log("index", index);
       if (dragIndex === index) {
         return {};
       }
@@ -89,6 +99,7 @@ class DragSortingTable extends React.Component {
     endTime: moment(),
     description: undefined,
     currentTitle: "",
+    markdownContent: "",
   };
 
   componentDidMount() {
@@ -96,6 +107,7 @@ class DragSortingTable extends React.Component {
     this.getAll();
     // 格式化数据
   }
+
   componentWillUnmount() {}
   components = {
     body: {
@@ -133,7 +145,9 @@ class DragSortingTable extends React.Component {
     if (hoverIndex !== dragIndex) {
       // 移动至最顶端
       if (hoverIndex === 0) {
-        order = data[0].order / 2;
+        // TODO: 有问题 如果第一个为0... （排除0的可能？）
+        // TODO: order = data[0].order -_baseOrder
+        order = data[0].order - _baseOrder;
       }
       // 移动至最底部
       else if (hoverIndex + 1 === count) {
@@ -172,26 +186,42 @@ class DragSortingTable extends React.Component {
   onEditorChange = (editorContent) => {
     const markDownContent = editorContent && draftToMarkdown(editorContent);
     // 过滤\s
-    const filterS = markDownContent.replace(/\\s/g,"");
-    content = filterS;
-    
+    const filterS = markDownContent.replace(/\\s/g, "");
+    // content = filterS;
   };
+
+  onChangeMarkDown = (markdownContent) => {
+    const filterS = markdownContent.replace(/\\s/g, "");
+    content = filterS;
+    console.log("In onChangeMarkDown", markdownContent);
+    // this.setState({ markdownContent });
+  };
+
   render() {
     const columns = [
       {
-        title: "项目编号",
+        title: "序号",
         dataIndex: "id",
         key: "id",
+        width: 50,
         render: (text, record, index) => `${index + 1}`,
       },
       {
         title: "项目名称",
         dataIndex: "title",
         key: "title",
+        ellipsis: {
+          showTitle: false,
+        },
+        width: 300,
         render: (text, record) => (
-          <a href="" onClick={(e) => this.showModal(e, record)}>
-            {text}
-          </a>
+          <Tooltip
+            placement="topLeft"
+            title={text}
+            onClick={(e) => this.showModal(e, record)}
+          >
+            <a href="">{text}</a>
+          </Tooltip>
         ),
       },
       {
@@ -199,12 +229,37 @@ class DragSortingTable extends React.Component {
         dataIndex: "state",
         key: "state",
         ellipsis: true,
+        filters: stateList,
+        onFilter: (value, record) => record.state.indexOf(value) === 0,
         render: (text, record) => `${record.stateValue}`,
       },
       {
-        title: "优先级",
+        title: "星级",
         dataIndex: "priority",
         key: "priority",
+        align: "center",
+        // width: 120,
+        render: (text) => {
+          const count = Number(text);
+          const grayCount = 10 - count;
+          var stars = [];
+          for (let index = 0; index < 10; index++) {
+            if (index < count) {
+              stars.push(
+                <img key={`star-${index}`} style={{ height: 8 }} src={star} />
+              );
+            } else {
+              stars.push(
+                <img
+                  key={`gray-star-${index}`}
+                  style={{ height: 8 }}
+                  src={grayStar}
+                />
+              );
+            }
+          }
+          return stars;
+        },
       },
       {
         title: "负责人",
@@ -228,11 +283,13 @@ class DragSortingTable extends React.Component {
         title: "项目进度",
         dataIndex: "progress",
         key: "progress",
+        align: "center",
       },
       {
         title: "查看项目",
         dataIndex: "link",
         key: "link",
+        align: "center",
         ellipsis: true,
         render: (text, record) => (
           <a href={text} target="_blank">
@@ -262,17 +319,12 @@ class DragSortingTable extends React.Component {
     // 维护一个状态列表
     const StateDropdown = (state) => {
       return (
-        <Select value={state} style={{ width: 120 }}>
-          <Option value="new">新建</Option>
-          <Option value="inprogress">进行中</Option>
-          <Option value="stop">暂停</Option>
-          <Option value="analyzing">需求调研分析</Option>
-          <Option value="testing">测试中</Option>
-          <Option value="designing">设计中</Option>
-          <Option value="running">运行维护</Option>
-          <Option value="done">完成</Option>
-          <Option value="archive">归档</Option>
-          <Option value="abandon">项目取消</Option>
+        <Select value={state} style={{ width: 200 }}>
+          {stateList.map((s) => (
+            <Option key={`select-${s.value}`} value={s.value}>
+              {s.text}
+            </Option>
+          ))}
         </Select>
       );
     };
@@ -284,13 +336,14 @@ class DragSortingTable extends React.Component {
         // TODO: ts 控制类型ProjectModel
         values.Id = currentId;
         values.title = currentTitle;
-        values.priority = parseInt(values.priority, 10);
         // 这里直接赋值 传递内容
+        values.priority = myStars;
         values.description = content;
         console.log("content", content);
         this.setState({
           loading: true,
           loadingAll: true,
+          ...values,
         });
         this.update(values);
       };
@@ -326,7 +379,7 @@ class DragSortingTable extends React.Component {
             <Col span={12}>
               <Form.Item label="项目名称">
                 <Input
-                  size="large"
+                  size="middle"
                   value={title}
                   prefix={<UserOutlined className="site-form-item-icon" />}
                 />
@@ -344,6 +397,7 @@ class DragSortingTable extends React.Component {
               <Form.Item label="项目描述" name="description">
                 <MarkDownEditor
                   onEditorChange={this.onEditorChange}
+                  onChangeMarkDown={this.onChangeMarkDown}
                   description={description}
                 />
               </Form.Item>
@@ -362,9 +416,12 @@ class DragSortingTable extends React.Component {
                 <Form.Item name="client" style={{ marginBottom: 10 }}>
                   <Input />
                 </Form.Item>
-                <label style={{ width: 300 }}>优先级</label>
+                <label style={{ width: 300 }}>星级</label>
                 <Form.Item name="priority" style={{ marginBottom: 10 }}>
-                  <Input />
+                  <Rate
+                    count={10}
+                    onChange={(priority) => (myStars = priority)}
+                  />
                 </Form.Item>
                 <label style={{ width: 300 }}>开始时间</label>
                 <Form.Item name="startTime" style={{ marginBottom: 10 }}>
@@ -400,10 +457,11 @@ class DragSortingTable extends React.Component {
         visible: false,
       });
     };
-
+    // const RNDContext = createDndContext(HTML5Backend);
+    // const manager = useRef(RNDContext);
     return (
       <DndProvider backend={HTML5Backend}>
-        <Spin tip="Loading..." spinning={loadingAll}>
+        <Spin tip="加载中..." spinning={loadingAll}>
           <Table
             size="small"
             columns={columns}
@@ -423,13 +481,14 @@ class DragSortingTable extends React.Component {
           style
           title="编辑项目"
           visible={visible}
+          centered={true}
           width={1000}
           onCancel={handleCancel}
           footer={
             [] // 设置footer为空，去掉 取消 确定默认按钮
           }
         >
-          <Spin tip="Loading..." spinning={loading}>
+          <Spin tip="加载中..." spinning={loading}>
             <EditModal />
           </Spin>
         </Modal>
@@ -453,6 +512,7 @@ class DragSortingTable extends React.Component {
   async getItem(Id) {
     const response = await fetch(`Project/GetItem?Id=${Id}`);
     const data = await response.json();
+    myStars = data.priority;
     this.setState({
       ...data,
       Id: this.state.currentId,
@@ -474,10 +534,9 @@ class DragSortingTable extends React.Component {
     });
     const response = await fetch(req);
     const data = await response.json();
-    console.log('data', data);
-    if(data.isSuccess){
+    if (data.isSuccess) {
       message.success("更新成功");
-    }else{
+    } else {
       message.error(`更新失败，${data.message}`);
     }
     this.setState({
@@ -500,11 +559,12 @@ class DragSortingTable extends React.Component {
       }
     );
     const response = await fetch(req);
-    console.log("response", response);
     await response.json();
 
     this.setState({ loadingAll: true });
     this.getAll();
+    // 触发父组件状态
+    this.props.getUpdateState();
   }
 }
 

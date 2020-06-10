@@ -1,12 +1,16 @@
-/* #components-table-demo-drag-sorting tr.drop-over-downward td {
-   border-bottom: 2px dashed #1890ff;
- }
-    
- #components-table-demo-drag-sorting tr.drop-over-upward td {
-   border-top: 2px dashed #1890ff;
- } */
-
- .site-card-wrapper {
+.site-card-wrapper {
   background: #ececec;
   padding: 30px;
+}
+
+tr.drop-over-downward{
+  border-bottom: 2px dashed #1890ff;
+}
+
+tr.drop-over-upward {
+  border-top: 2px dashed #1890ff;
+}
+/*这里必须设置table样式否则bottom样式不会生效*/
+table{
+  border-collapse: collapse !important;
 }
