@@ -4,14 +4,12 @@ import {
   Card,
   Spin,
   DatePicker,
-  Menu,
   Row,
   Col,
   ConfigProvider,
   Select,
 } from "antd";
 import { employers } from "../mock/users";
-import { TeamOutlined, LaptopOutlined } from "@ant-design/icons";
 import React from "react";
 import moment from "moment";
 import { find } from "lodash";
@@ -86,7 +84,7 @@ export class DailyReport extends React.Component {
 
   // 改变任意状态重新筛选内容
   FilterData = () => {
-    const { currentEmp, currentProject, data, allData } = this.state;
+    const { currentEmp, currentProject, allData } = this.state;
     let newData = allData;
     let newProject = [];
     // 当前没有选择任何项目
@@ -273,7 +271,7 @@ export class DailyReport extends React.Component {
       const { currentEmp, currentProject } = this.state;
       const onChange = (value) => {
         // 设置选中的内容
-        if (type == "人员") {
+        if (type === "人员") {
           this.setState(
             {
               currentEmp:value
@@ -281,7 +279,7 @@ export class DailyReport extends React.Component {
                this.FilterData();
             }
           );
-        } else if (type == "项目") {
+        } else if (type === "项目") {
           this.setState(
             {
               currentProject:value

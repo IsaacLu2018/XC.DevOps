@@ -24,7 +24,7 @@ export class NavMenu extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("刷新最后更新时间");
+    // console.log("刷新最后更新时间");
     this.getLastUpdateInfo();
   }
 

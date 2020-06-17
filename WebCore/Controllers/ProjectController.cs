@@ -112,7 +112,7 @@ namespace XC.DevOps.Controllers
                         model.team = project.Team;
                         model.order = project.Order;
                         model.client = project.Client;
-                        model.stateValue = CommonEnumable.stateDic[project.State];
+                        model.stateValue = project.State == null ? null : CommonEnumable.stateDic[project.State];
                     }
                     else
                     {
@@ -292,7 +292,7 @@ namespace XC.DevOps.Controllers
         [HttpGet("GetProjects")]
         public List<string> GetProjects()
         {
-            return _context.DevopsProject.Select(p=>p.Title).ToList();
+            return _context.DevopsProject.Select(p => p.Title).ToList();
         }
     }
 }

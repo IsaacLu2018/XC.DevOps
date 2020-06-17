@@ -36,21 +36,12 @@ const { Option } = Select;
 const _baseOrder = 655236;
 let content = "";
 let myStars = 0;
-
-const DragableBodyRow = ({
-  index,
-  moveRow,
-  className,
-  style,
-  ...restProps
-}) => {
+let DragableBodyRow = ({ index, moveRow, className, style, ...restProps }) => {
   const ref = React.useRef();
   const [{ isOver, dropClassName }, drop] = useDrop({
     accept: type,
     collect: (monitor) => {
       const { index: dragIndex } = monitor.getItem() || {};
-      console.log("dragIndex", dragIndex);
-      console.log("index", index);
       if (dragIndex === index) {
         return {};
       }
@@ -80,7 +71,6 @@ const DragableBodyRow = ({
     />
   );
 };
-
 class DragSortingTable extends React.Component {
   state = {
     loadingAll: true,
@@ -100,6 +90,7 @@ class DragSortingTable extends React.Component {
     description: undefined,
     currentTitle: "",
     markdownContent: "",
+    disableDrag: false,
   };
 
   componentDidMount() {
@@ -133,53 +124,56 @@ class DragSortingTable extends React.Component {
     const { data } = this.state;
     const dragRow = data[dragIndex];
     const count = data.length;
+    if (this.state.disableDrag) {
+      message.error("请勿在筛选状态下排序");
+    } else {
+      // 1. 移动至顶端
+      // 2. 中间移动
+      // 3. 移动至于底部
+      // 没动就不处理逻辑了
+      let priority = dragRow.priority;
+      let order = 2.0;
 
-    // 1. 移动至顶端
-    // 2. 中间移动
-    // 3. 移动至于底部
-    // 没动就不处理逻辑了
-    let priority = dragRow.priority;
-    let order = 2.0;
-
-    //没有发生移动 就不更新了
-    if (hoverIndex !== dragIndex) {
-      // 移动至最顶端
-      if (hoverIndex === 0) {
-        // TODO: 有问题 如果第一个为0... （排除0的可能？）
-        // TODO: order = data[0].order -_baseOrder
-        order = data[0].order - _baseOrder;
-      }
-      // 移动至最底部
-      else if (hoverIndex + 1 === count) {
-        order = data[hoverIndex].order + _baseOrder;
-      }
-      // 中间的移动
-      else {
-        // 默认为向上移动
-        let topRow = data[hoverIndex - 1];
-        let nextRow = data[hoverIndex];
-        // 向下移动
-        if (hoverIndex > dragIndex) {
-          topRow = data[hoverIndex];
-          nextRow = data[hoverIndex + 1];
+      //没有发生移动 就不更新了
+      if (hoverIndex !== dragIndex) {
+        // 移动至最顶端
+        if (hoverIndex === 0) {
+          // TODO: 有问题 如果第一个为0... （排除0的可能？）
+          // TODO: order = data[0].order -_baseOrder
+          order = data[0].order - _baseOrder;
         }
-        order = (topRow.order + nextRow.order) / 2;
+        // 移动至最底部
+        else if (hoverIndex + 1 === count) {
+          order = data[hoverIndex].order + _baseOrder;
+        }
+        // 中间的移动
+        else {
+          // 默认为向上移动
+          let topRow = data[hoverIndex - 1];
+          let nextRow = data[hoverIndex];
+          // 向下移动
+          if (hoverIndex > dragIndex) {
+            topRow = data[hoverIndex];
+            nextRow = data[hoverIndex + 1];
+          }
+          order = (topRow.order + nextRow.order) / 2;
+        }
+        const Id = dragRow.id;
+        // 设置
+        this.setOrder(Id, priority, order);
       }
-      const Id = dragRow.id;
-      // 设置
-      this.setOrder(Id, priority, order);
-    }
 
-    this.setState(
-      update(this.state, {
-        data: {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, dragRow],
-          ],
-        },
-      })
-    );
+      this.setState(
+        update(this.state, {
+          data: {
+            $splice: [
+              [dragIndex, 1],
+              [hoverIndex, 0, dragRow],
+            ],
+          },
+        })
+      );
+    }
   };
 
   //获取内容变化值
@@ -230,7 +224,13 @@ class DragSortingTable extends React.Component {
         key: "state",
         ellipsis: true,
         filters: stateList,
-        onFilter: (value, record) => record.state.indexOf(value) === 0,
+        onFilter: (value, record) => {
+          if (record.state) {
+            return record.state.indexOf(value) === 0;
+          }else{
+            return false;
+          }
+        },
         render: (text, record) => `${record.stateValue}`,
       },
       {
@@ -331,15 +331,16 @@ class DragSortingTable extends React.Component {
 
     const EditModal = () => {
       const onFinish = (values) => {
-        console.log("Success:", values);
         // TODO: 调用api 完成修改
         // TODO: ts 控制类型ProjectModel
+        values.startTime = moment(values.startTime).add(1,'day');
+        values.endTime = moment(values.endTime).add(1,'day');
+        
         values.Id = currentId;
         values.title = currentTitle;
         // 这里直接赋值 传递内容
         values.priority = myStars;
         values.description = content;
-        console.log("content", content);
         this.setState({
           loading: true,
           loadingAll: true,
@@ -469,6 +470,10 @@ class DragSortingTable extends React.Component {
             components={this.components}
             rowKey={(record) => record.id}
             pagination={false}
+            onChange={(pagination, filters) => {
+              const disableDrag = filters.state === null ? false : true;
+              this.setState({ disableDrag });
+            }}
             onRow={(record, index) => ({
               index,
               moveRow: this.moveRow,
