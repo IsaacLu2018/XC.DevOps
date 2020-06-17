@@ -227,7 +227,7 @@ class DragSortingTable extends React.Component {
         onFilter: (value, record) => {
           if (record.state) {
             return record.state.indexOf(value) === 0;
-          }else{
+          } else {
             return false;
           }
         },
@@ -333,20 +333,27 @@ class DragSortingTable extends React.Component {
       const onFinish = (values) => {
         // TODO: 调用api 完成修改
         // TODO: ts 控制类型ProjectModel
-        values.startTime = moment(values.startTime).add(1,'day');
-        values.endTime = moment(values.endTime).add(1,'day');
-        
         values.Id = currentId;
         values.title = currentTitle;
         // 这里直接赋值 传递内容
         values.priority = myStars;
         values.description = content;
+        const { startTime, endTime } = this.state;
+        // 修复日期为空值的bug
+        let updateStart = true;
+        let updateEnd = true;
+        if (!startTime) {
+          updateStart = false;
+        }
+        if (!endTime) {
+          updateEnd = false;
+        }
         this.setState({
           loading: true,
           loadingAll: true,
           ...values,
         });
-        this.update(values);
+        this.update(values, updateStart, updateEnd);
       };
 
       const onFinishFailed = (errorInfo) => {
@@ -522,14 +529,20 @@ class DragSortingTable extends React.Component {
       ...data,
       Id: this.state.currentId,
       title: this.state.currentTitle,
-      endTime: data.endTime ? moment(data.endTime) : moment(),
-      startTime: data.startTime ? moment(data.startTime) : moment(),
+      endTime: data.endTime ? moment(data.endTime) : undefined,
+      startTime: data.startTime ? moment(data.startTime) : undefined,
       loading: false,
     });
   }
 
   // 修改某个项目
-  async update(model) {
+  async update(model, updateStart, updateEnd) {
+    if (updateStart) {
+      model.startTime = moment(model.startTime).add(1, "day");
+    }
+    if (updateEnd) {
+      model.endTime = moment(model.endTime).add(1, "day");
+    }
     var req = new Request("Project/Update", {
       method: "POST",
       headers: {
